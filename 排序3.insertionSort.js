@@ -12,22 +12,55 @@
 
  */
 // 基础写法
-// function insertionSort(arr) {
-//   if(!arr || arr.length <2) {
-//     return arr;
-//   }
-//   for(let i = 1; i < arr.length; i++) {
-//     let n = arr[i];
-//     for(let j = i-1; j >= 0; j--) {
-//       if(n < arr[j]) {
-//         arr[j + 1] = arr[j];
-//       } else {
-//         arr[j + 1] = n;
-//         break;
-//       }
-//     }
-//   }
-//   return  arr;
-// }
+function insertionSort(arr) {
+  if (!arr || arr.length < 2) {
+    return arr;
+  }
+  for (let i = 1; i < arr.length; i++) {
+    let n = arr[i];
+    for (let j = i - 1; j >= 0; j--) {
+      if (n < arr[j]) {
+        arr[j + 1] = arr[j];
+      } else {
+        arr[j + 1] = n;
+        break;
+      }
+    }
+  }
+  return arr;
+}
+
+// 二分
+function binarySearchFirstEqualMore(arr, num, s, e) {
+  let l = s,
+    r = e;
+  for (; l < r; ) {
+    let mid = Math.floor(l + (r - l) / 2);
+    if (arr[mid] < num) {
+      l = mid + 1;
+    } else {
+      r = mid;
+    }
+  }
+  return arr[r] < num ? r + 1 : r;
+}
+
+// console.log(binarySearchFirstEqualMore([1, 2, 3], 0, 0, 2));
 
 // 二分写法 todo
+function binarySearchInsertionSort(arr) {
+  if (!arr || arr.length < 2) {
+    return arr;
+  }
+  for (let i = 1; i < arr.length; i++) {
+    let index = binarySearchFirstEqualMore(arr, arr[i], 0, i - 1);
+    let num = arr[i];
+    for (let j = i; j > index; j--) {
+      arr[j] = arr[j - 1];
+    }
+    arr[index] = num;
+  }
+  return arr;
+}
+
+console.log(binarySearchInsertionSort([2, 6, 7, 2, 9, 1, 0, 10]));
