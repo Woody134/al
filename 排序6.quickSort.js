@@ -45,8 +45,42 @@ function dutchFlagProblem(arr, num) {
  * 快排3.0
  * 随机选一个数，跟最后位置一个数交换，做num,开始划分；小于区，等于区，大于区，重复，搞定值等于num的位置
  * 最坏时间复杂度O(NlogN),num打偏
+ * 不稳定
  * p4 2:21 https://www.bilibili.com/video/BV13g41157hK?p=4&vd_source=b89b387b8770a0b69ddab591194bd329
  */
+function quickSort(arr) {
+  quickSortProcess(arr, 0, arr.length - 1);
+  return arr;
+}
+
+function quickSortProcess(arr, l, r) {
+  if (!arr || arr.length < 2 || l >= r) return arr;
+  let [lessP, moreP] = partation(arr, l, r);
+  quickSortProcess(arr, l, lessP);
+  quickSortProcess(arr, moreP, r);
+}
+
 function partation(arr, l, r) {
-  let random = Marh.random() * (r - l + 1);
+  // 区别好r,arr.length-1,moreP
+  if (l >= r) return arr;
+  // 注意random的算法
+  let random = Math.random();
+  random = Math.floor(random * (r - l + 1) + l);
+  [arr[random], arr[r]] = [arr[r], arr[random]];
+  let lessP = l - 1,
+    moreP = r + 1;
+  let num = arr[r];
+  for (let i = l; i < moreP; ) {
+    if (arr[i] < num) {
+      [arr[i], arr[lessP + 1]] = [arr[lessP + 1], arr[i]];
+      lessP++;
+      i++;
+    } else if (arr[i] === num) {
+      i++;
+    } else if (arr[i] > num) {
+      [arr[i], arr[moreP - 1]] = [arr[moreP - 1], arr[i]];
+      moreP--;
+    }
+  }
+  return [lessP, moreP];
 }
