@@ -36,6 +36,17 @@ class LinkedList {
     this.head = node;
     this.length++;
   }
+
+  insert(node) {
+    if (this.head === null) {
+      this.head = node;
+      this.tail = node;
+    } else {
+      this.tail.next = node;
+      this.tail = node;
+    }
+    this.length++;
+  }
 }
 
 /**
@@ -138,12 +149,12 @@ list8.append(2);
 list8.append(3);
 list8.append(1);
 
-console.log('list3:', isPalindromeList(list3));
-console.log('list4:', isPalindromeList(list4));
-console.log('list5:', isPalindromeList(list5));
-console.log('list6:', isPalindromeList(list6));
-console.log('list7:', isPalindromeList(list7));
-console.log('list8:', isPalindromeList(list8));
+// console.log('list3:', isPalindromeList(list3));
+// console.log('list4:', isPalindromeList(list4));
+// console.log('list5:', isPalindromeList(list5));
+// console.log('list6:', isPalindromeList(list6));
+// console.log('list7:', isPalindromeList(list7));
+// console.log('list8:', isPalindromeList(list8));
 
 /**
  * 面试解法3:要求若链表长度为N，时间复杂度O(N),空间复杂度O(1)
@@ -151,24 +162,168 @@ console.log('list8:', isPalindromeList(list8));
  * 1->2<-3
  * 1->2->2<-3
  */
-// function isPalindromeList2(list) {
-//   let f = (s = list.head);
-//   while (f & f.next) {
-//     s = s.next;
-//     f = f.next.next;
-//   }
-//   let m = s;
-//   let p = s.next;
-// }
+function isPalindromeList2(list) {
+  let f = (s = list.head);
+  while (f && f.next) {
+    s = s.next;
+    f = f.next.next;
+  }
+  let reverHalfListHead = reverse(s);
+  let tail = reverHalfListHead;
+  let head = list.head;
+  for (; head && tail; ) {
+    console.log(head.value, tail.value);
+    if (head.value !== tail.value) {
+      reverse(reverHalfListHead);
+      return false;
+    }
+    head = head.next;
+    tail = tail.next;
+  }
+  reverse(reverHalfListHead);
+  return true;
+}
 
-// function reverse(list) {
-//   if (!list.head || !list.head.next) return;
-//   let pre = list.head;
-//   let p = pre.next;
-//   pre.next = null;
-//   let q = p.next;
-//   for (; p; ) {
-//     p.next = pre;
-//     p = q;
-//   }
-// }
+function reverse(listHead) {
+  let pre = null;
+  let p = listHead;
+  for (; p; ) {
+    let next = p.next;
+    p.next = pre;
+    pre = p;
+    p = next;
+  }
+  return pre;
+}
+
+// console.log('list3:', isPalindromeList2(list3));
+// console.log('list4:', isPalindromeList2(list4));
+// console.log('list5:', isPalindromeList2(list5));
+// console.log('list6:', isPalindromeList2(list6));
+// console.log('list7:', isPalindromeList2(list7));
+// console.log('list8:', isPalindromeList2(list8));
+
+/**
+ * 题目2：将单链表按某值划分成左边小，中间等，右边大的形式
+ * 方法1：压进栈里，分三类弹出，三个list，再串起来
+ */
+function threePartList(list, num) {
+  let head = list.head;
+  let arr = [];
+  for (; head; head = head.next) {
+    arr.push(head.value);
+  }
+  let less = new LinkedList();
+  let more = new LinkedList();
+  let equal = new LinkedList();
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] < num) {
+      less.append(arr[i]);
+    } else if (arr[i] === num) {
+      equal.append(arr[i]);
+    } else {
+      more.append(arr[i]);
+    }
+  }
+  let lessP = less.head;
+  let equalP = equal.head;
+  let moreP = more.head;
+  let resultHead = null;
+  resultHead = lessP || equalP || moreP;
+  let p = resultHead;
+  while (lessP && lessP.next) {
+    p.next = lessP.next;
+    lessP = lessP.next;
+    p = p.next; // 注意：务必记得移动指针
+  }
+  p === equalP && equalP ? (equalP = equalP.next) : '';
+  while (equalP) {
+    p.next = equalP;
+    equalP = equalP.next;
+    p = p.next;
+  }
+  p === moreP && moreP ? (moreP = moreP.next) : '';
+  while (moreP) {
+    p.next = moreP;
+    moreP = moreP.next;
+    p = p.next;
+  }
+  for (p = resultHead; p; p = p.next) {
+    console.log(p.value);
+  }
+  return resultHead;
+}
+
+// console.log(threePartList(list3, 4));
+// console.log(2);
+
+/**
+ * 方法二，直接拆成三个链表，再串起来
+ */
+function threePartList2(list, num) {
+  let lessHead = null;
+  let lessTail = null;
+  let equalHead = null;
+  let equalTail = null;
+  let moreHead = null;
+  let moreTail = null;
+  let head = list.head;
+  while (head) {
+    if (head.value < num) {
+      if (!lessHead) {
+        lessHead = head;
+      } else {
+        lessTail.next = head;
+      }
+      lessTail = head;
+    } else if (head.value === num) {
+      if (!equalHead) {
+        equalHead = head;
+      } else {
+        equalTail.next = head;
+      }
+      equalTail = head;
+    } else {
+      if (!moreHead) {
+        moreHead = head;
+      } else {
+        moreTail.next = head;
+      }
+      moreTail = head;
+    }
+    head = head.next;
+  }
+
+  // 三个串起来
+  // 注意给endTail.next赋值null
+  let resultHead = null;
+  resultHead = lessHead || equalHead || moreHead;
+  lessTail && (equalHead || moreHead) ? (lessTail.next = equalHead || moreHead) : lessTail ? (lessTail.next = null) : '';
+  equalTail && moreHead ? (equalTail.next = moreHead) : equalTail ? (equalTail.next = null) : '';
+  moreTail ? (moreTail.next = null) : '';
+  for (let p = resultHead; p; p = p.next) {
+    console.log(p.value);
+  }
+  return resultHead;
+}
+
+console.log(threePartList2(list8, 2));
+
+/**
+ * 题目3：特殊含有random指针的Node,复制
+ * 方法1：用哈希表，key旧节点，value新节点，第一次遍历复制节点；第二次遍历根据哈希表，把ranom指针加上
+ * 方法2: 第一遍遍历节点，新节点插在旧节点后面；第二遍，新节点random指针指向旧节点指针的next；第三遍，分离新旧节点
+ * 方法二链表位置的一一对应，相当于哈希表的作用
+ */
+
+/**
+ * 题目：两个链表相交的一系列问题
+ * 题目4：判断一个链表是否有环，有环返回第一个入环节点，否则返回null
+ */
+function getFirttCircleNode(list) {}
+
+/**
+ * 题目：两个链表相交的一系列问题
+ * 题目5：给定两个可能有环也可能无环的单链表，头节点head1、head2，请实现一个函数，若两个链表相交，返回第一个相交节点，否则返回null
+ * 要求时间复杂度o(N),空间复杂度o(1)
+ */
