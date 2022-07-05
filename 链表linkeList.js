@@ -149,6 +149,21 @@ list8.append(2);
 list8.append(3);
 list8.append(1);
 
+list9 = new LinkedList();
+list9.append(1);
+list9.append(2);
+list9.append(3);
+list9.append(4);
+node1 = new Node(10);
+list9.insert(node1);
+list9.append(5);
+list9.append(6);
+list9.append(7);
+list9.append(8);
+list9.append(9);
+list9.append(10);
+list9.insert(node1);
+
 // console.log('list3:', isPalindromeList(list3));
 // console.log('list4:', isPalindromeList(list4));
 // console.log('list5:', isPalindromeList(list5));
@@ -307,7 +322,7 @@ function threePartList2(list, num) {
   return resultHead;
 }
 
-console.log(threePartList2(list8, 2));
+// console.log(threePartList2(list8, 2));
 
 /**
  * 题目3：特殊含有random指针的Node,复制
@@ -319,11 +334,67 @@ console.log(threePartList2(list8, 2));
 /**
  * 题目：两个链表相交的一系列问题
  * 题目4：判断一个链表是否有环，有环返回第一个入环节点，否则返回null
+ * 方法1：使用额外数据结构,遍历，set，第一个重复的
+ * 方法2：快慢指针
  */
-function getFirttCircleNode(list) {}
+function getFirstCircleNode(list) {
+  if (!list.head || !list.head.next || !list.head.next.next) {
+    return null;
+  }
+  let s = list.head.next;
+  let f = list.head.next.next;
+  while (f && s !== f) {
+    s = s.next;
+    f = f.next.next;
+  }
+  if (!f) return null;
+  f = list.head;
+  while (s !== f) {
+    s = s.next;
+    f = f.next;
+  }
+  return f;
+}
+
+console.log(getFirstCircleNode(list9));
+console.log(getFirstCircleNode(list8));
 
 /**
  * 题目：两个链表相交的一系列问题
  * 题目5：给定两个可能有环也可能无环的单链表，头节点head1、head2，请实现一个函数，若两个链表相交，返回第一个相交节点，否则返回null
  * 要求时间复杂度o(N),空间复杂度o(1)
  */
+function getTwoListFirstSameNode(list1, list2) {
+  let list1Length = 0;
+  let list2Length = 0;
+  let p = null;
+  let q = null;
+  let list1FirstCircleNode = getFirstCircleNode(list1);
+  let list2FirstCircleNode = getFirstCircleNode(list2);
+
+  if((list1FirstCircleNode && !list2FirstCircleNode) ||(!list1FirstCircleNode && list2FirstCircleNode)) return null;
+
+  // 都无环
+  if(!list1FirstCircleNode && !list2FirstCircleNode) {
+    for(p = list1.head;p.next;p=p.next) {
+      list1Length++;
+    }
+    for(q = list2.head;q.next;q=q.next) {
+      list2Length++;
+    }
+  
+    if(p && p === q) {
+      let n = list2Length-list1Length;
+      let p = list1.head;
+      let q = list2.head;
+      for(let i = 0; i< (n + Math.abs(-n))/2;i++){
+
+      }
+
+      for(let i = 0; i< (n + Math.abs(n))/2;)
+    }
+  }
+
+
+
+}
