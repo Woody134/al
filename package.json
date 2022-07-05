@@ -1,0 +1,21 @@
+{
+  "name": "al",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dichotomy.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Woody134/al.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Woody134/al/issues"
+  },
+  "homepage": "https://github.com/Woody134/al#readme"
+}
