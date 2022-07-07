@@ -155,6 +155,11 @@ list9.append(2);
 list9.append(3);
 list9.append(4);
 node1 = new Node(10);
+node2 = new Node(11);
+node3 = new Node(12);
+
+list9.insert(node2);
+
 list9.insert(node1);
 list9.append(5);
 list9.append(6);
@@ -163,6 +168,19 @@ list9.append(8);
 list9.append(9);
 list9.append(10);
 list9.insert(node1);
+
+list10 = new LinkedList();
+list10.append(1);
+list10.append(2);
+list10.append(3);
+list10.append(4);
+list10.append(5);
+list10.append(6);
+list10.append(7);
+list10.append(8);
+list10.append(9);
+list10.append(10);
+list10.insert(node1);
 
 // console.log('list3:', isPalindromeList(list3));
 // console.log('list4:', isPalindromeList(list4));
@@ -343,11 +361,11 @@ function getFirstCircleNode(list) {
   }
   let s = list.head.next;
   let f = list.head.next.next;
-  while (f && s !== f) {
+  while (f && f.next && s !== f) {
     s = s.next;
     f = f.next.next;
   }
-  if (!f) return null;
+  if (!f || !f.next) return null;
   f = list.head;
   while (s !== f) {
     s = s.next;
@@ -356,8 +374,8 @@ function getFirstCircleNode(list) {
   return f;
 }
 
-console.log(getFirstCircleNode(list9));
-console.log(getFirstCircleNode(list8));
+// console.log(getFirstCircleNode(list9));
+// console.log(getFirstCircleNode(list8));
 
 /**
  * 题目：两个链表相交的一系列问题
@@ -371,30 +389,46 @@ function getTwoListFirstSameNode(list1, list2) {
   let q = null;
   let list1FirstCircleNode = getFirstCircleNode(list1);
   let list2FirstCircleNode = getFirstCircleNode(list2);
+  console.log(list1FirstCircleNode, list2FirstCircleNode, list2FirstCircleNode == list2FirstCircleNode);
 
-  if((list1FirstCircleNode && !list2FirstCircleNode) ||(!list1FirstCircleNode && list2FirstCircleNode)) return null;
+  if ((list1FirstCircleNode && !list2FirstCircleNode) || (!list1FirstCircleNode && list2FirstCircleNode)) return null;
 
-  // 都无环
-  if(!list1FirstCircleNode && !list2FirstCircleNode) {
-    for(p = list1.head;p.next;p=p.next) {
+  // 都无环 或者 都有环在入环前相交
+  if (list1FirstCircleNode === list2FirstCircleNode) {
+    for (p = list1.head; p.next && p !== list1FirstCircleNode; p = p.next) {
       list1Length++;
     }
-    for(q = list2.head;q.next;q=q.next) {
+    for (q = list2.head; q.next && q !== list2FirstCircleNode; q = q.next) {
       list2Length++;
     }
-  
-    if(p && p === q) {
-      let n = list2Length-list1Length;
+
+    if (p && p === q) {
+      let n = list2Length - list1Length;
       let p = list1.head;
       let q = list2.head;
-      for(let i = 0; i< (n + Math.abs(-n))/2;i++){
-
+      for (let i = 0; i < (-n + Math.abs(n)) / 2; i++) {
+        p = p.next;
       }
 
-      for(let i = 0; i< (n + Math.abs(n))/2;)
+      for (let i = 0; i < (n + Math.abs(n)) / 2; i++) {
+        q = q.next;
+      }
+      while (p !== q && p && q) {
+        p = p.next;
+        q = q.next;
+      }
+      if (p === q) {
+        return p;
+      } else {
+        return false;
+      }
     }
   }
 
-
-
+  // 都有环，且入环后相交
+  if (list1FirstCircleNode && list2FirstCircleNode && list1FirstCircleNode !== list2FirstCircleNode) {
+    return list1FirstCircleNode;
+  }
 }
+
+// console.log(getTwoListFirstSameNode(list9, list10));
