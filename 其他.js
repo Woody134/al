@@ -138,4 +138,128 @@ function flatToTree(flat) {
   return result;
 }
 
-console.log(flatToTree(flatSource));
+// console.log(flatToTree(flatSource));
+
+// Manacher算法
+var getManacherString = function (str) {
+  if (str === null || str.length < 1) return '';
+  let result = '';
+  for (let i = 0; i < str.length; i++) {
+    // result.concat('#');
+    // result.concat(str[i]);
+    // tips注意 concat padEnd都不修改原字符串
+    result = result.padEnd(result.length + 1, '#');
+    result = result.padEnd(result.length + 1, str[i]);
+  }
+  // result.concat('#');
+  result = result.padEnd(result.length + 1, '#');
+
+  return result;
+};
+
+var longestPalindrome = function (s) {
+  debugger;
+  if (s === null || s.length < 1) return '';
+  let str = getManacherString(s);
+  let maxlenth = Number.NEGATIVE_INFINITY; // 当前最长回文序列长度
+  let maxIndex = -1; // 当前最长回文序列中心位置
+  let R = -1; // 回文右边界加一的位置
+  let C = -1; // 得到R值的回文序列终点位置
+  let pArr = []; // 回文半径数组
+
+  for (let i = 0; i < str.length; i++) {
+    // 当前位置的不用再匹配的半径
+    pArr[i] = i < R ? Math.min(pArr[2 * C - i], R - i) : 1;
+
+    // 向外匹配拓展pArr[i]
+    while (i - pArr[i] >= 0 && i + pArr[i] < str.length && str[i + pArr[i]] === str[i - pArr[i]]) {
+      pArr[i]++;
+    }
+
+    // 更新R,C
+    if (pArr[i] + i > R) {
+      R = pArr[i] + i;
+      C = i;
+    }
+    // 更新maxlenth,maxIndex
+    if (pArr[i] > maxlenth) {
+      maxlenth = pArr[i];
+      maxIndex = i;
+    }
+  }
+
+  // 取最长回文子串
+  let realStart = Math.floor((maxIndex - maxlenth + 1) / 2);
+  let real2R = maxlenth - 1;
+  return s.slice(realStart, realStart + real2R);
+};
+
+// console.log(longestPalindrome('babad'));
+
+var maxSumMinProduct = function (nums) {
+  // 计算数组左右最近的，比当前值小的index
+  let stack = []; // 栈底到栈顶由小到大
+  let result = new Map(); // key:index value: 最近的比当前元素小的坐标[l,r];
+  for (let i = 0; i < nums.length; i++) {
+    while (stack.length !== 0 && nums[i] < nums[stack[stack.length - 1][0]]) {
+      let curr = stack.pop();
+      let l = -1;
+      if (stack.length - 1 >= 0) {
+        let arr = stack[stack.length - 1];
+        l = arr[arr.length - 1];
+      }
+      let r = i;
+      for (let j = 0; j < curr.length; j++) {
+        result.set(curr[j], [l, r]);
+      }
+    }
+    if (stack.length === 0 || nums[stack[stack.length - 1][0]] !== nums[i]) stack.push([i]);
+    else stack[stack.length - 1].push(i);
+  }
+
+  while (stack.length > 0) {
+    curr = stack.pop();
+    let r = nums.length;
+    let l = 0;
+    if (stack.length - 1 >= 0) {
+      let arr = stack[stack.length - 1];
+      l = arr[arr.length - 1];
+    }
+    for (let j = 0; j < curr.length; j++) {
+      result.set(curr[j], [l, r]);
+    }
+  }
+
+  // 算最小乘积
+  let max = 0;
+  let maxIndex = -1;
+  for (let i = 0; i < nums.length; i++) {
+    let [l, r] = result.get(i);
+    let sum = getSum(nums, l, r); // 求和，不包括l,r
+    let product = sum * nums[i];
+    // max = Math.max(max, product);
+    if (product > max) {
+      max = product;
+      maxIndex = i;
+    }
+  }
+
+  return maxIndex;
+};
+
+/**
+ * nums l+1 r-1范围上求和
+ *
+ * @param {*} nums
+ * @param {*} l
+ * @param {*} r
+ */
+var getSum = function (nums, l, r) {
+  let sum = 0;
+  for (let i = l + 1; i < r; i++) {
+    sum += nums[i];
+  }
+  return sum;
+};
+
+console.log();

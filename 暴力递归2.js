@@ -144,3 +144,76 @@ function NQueenProcess(n, i, hasNot, leftNot, rightNot) {
 }
 
 // console.log(NQueen(8));
+
+var PredictTheWinner = function (nums) {
+  debugger;
+  let fDp = new Array(nums.length);
+  let sDp = new Array(nums.length);
+  for (let i = 0; i < nums.length; i++) {
+    fDp = new Array(nums.length).fill(-1);
+    sDp = new Array(nums.length).fill(-1);
+  }
+
+  let firstV = first(nums, 0, nums.length - 1, fDp, sDp);
+  let secondV = second(nums, 0, nums.length - 1, fDp, sDp);
+
+  return firstV >= secondV;
+};
+
+var first = function (nums, l, r, fDp, sDp) {
+  if (l === r) {
+    fDp[l][r] = nums[l];
+    return fDp[l][r];
+  }
+  if (fDp[l][r] !== -1) return fDp[l][r];
+
+  fDp[l][r] = Math.max(nums[l] + second(nums, l + 1, r, fDp, sDp), nums[r] + second(nums, l, r - 1, fDp, sDp));
+  return fDp[l][r];
+};
+
+/**
+ * 后手函数，等先手在l r上取完后取，返回最大值
+ * @param {*} nums
+ * @param {*} l
+ * @param {*} r
+ */
+var second = function (nums, l, r, fDp, sDp) {
+  if (l === r) {
+    sDp[l][r] = 0;
+    return sDp[l][r];
+  }
+  if (sDp[l][r] !== -1) return sDp[l][r];
+
+  // 先手会给后手留一个小的
+  sDp[l][r] = Math.min(first(nums, l + 1, r, fDp, sDp), first(nums, l, r - 1, fDp, sDp));
+  return sDp[l][r];
+};
+
+// console.log(PredictTheWinner([1, 5, 233, 2]));
+
+var minCostClimbingStairs = function (cost) {
+  debugger;
+  if (cost.length < 1) return 0;
+
+  // let dp0 = new Array(cost.length + 2).fill(-1);
+  let dp1 = new Array(cost.length + 2).fill(-1);
+
+  // process(0, 0, cost, dp0);
+  process(1, 0, cost, dp1);
+
+  // return Math.min(dp0[cost.length], dp1[cost.length]);
+};
+
+var process = function (i, costSum, cost, dp) {
+  // if (dp[i] !== -1) return dp[i];
+  if (i >= cost.length) {
+    dp[i] = costSum;
+    return costSum;
+  }
+  // if (i > cost.length - 1) return Number.POSITIVE_INFINITY; // or-1?
+  let one = process(i + 1, costSum + cost[i], cost, dp);
+  let two = process(i + 2, costSum + cost[i], cost, dp);
+  dp[i] = Math.min(one, two);
+  return Math.min(one, two);
+};
+console.log(minCostClimbingStairs([10, 15, 20]));

@@ -432,3 +432,33 @@ function getTwoListFirstSameNode(list1, list2) {
 }
 
 // console.log(getTwoListFirstSameNode(list9, list10));
+
+list11 = new LinkedList();
+list11.append(1);
+list11.append(2);
+list11.append(2);
+list11.append(1);
+
+var isPalindrome = function (head) {
+  debugger;
+  if (head === null || head.next === null) return false;
+  let s = head,
+    f = head;
+  let stack = [];
+  stack.push(s.value);
+  while (f.next !== null && f.next.next !== null) {
+    s = s.next;
+    f = f.next.next;
+    stack.push(s.value);
+  }
+  s = s.next;
+  if (!f.next) stack.pop();
+  while (s) {
+    let pop = stack.pop();
+    if (s.value !== pop) return false;
+    s = s.next;
+  }
+  return true;
+};
+
+console.log(isPalindrome(list11.head));
