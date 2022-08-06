@@ -141,9 +141,83 @@ function secondChoose(arr, l, r) {
   return Math.min(firstLeft, firstRight);
 }
 
-abChoosePoker([1, 2, 100, 4]);
+// abChoosePoker([1, 2, 100, 4]);
 
 /**
  * 题目6 给你一个栈，不能申请额外的数据结构，只能使用递归，逆序这个栈
  * P11 1:32:00 https://www.bilibili.com/video/BV13g41157hK?p=11&vd_source=b89b387b8770a0b69ddab591194bd329
  */
+
+// 烂橘子
+var orangesRotting = function (grid) {
+  let loopCount = 0;
+  let m = grid.length;
+  let n = grid[0].length;
+  let arr = []; //存每轮需要感染中心点左边对[[i,j],[i,j]]，记得更新，存一个num?
+  let freshNum = 0;
+  let badNum = 0;
+  let hasInfect = true;
+  // 第一轮遍历
+  for (let i = 0; i < m; i++) {
+    for (let j = 0; j < n; j++) {
+      if (grid[i][j] === 1) freshNum++;
+      else if (grid[i][j] === 2) arr.push([i, j]);
+    }
+  }
+
+  // 有新鲜橘子，没有腐烂橘子，永远不会全腐烂，返回-1
+  badNum = arr.length;
+  if (freshNum > 0 && arr.length === 0) return -1;
+
+  while (hasInfect) {
+    loopCount++;
+    [hasInfect, freshNum, arr] = infect(grid, arr, freshNum);
+  }
+  return freshNum > 0 ? -1 : loopCount - 1;
+};
+
+// arr[i,j] 感染ij周围的，感染了至少一个返回true,否则返回flase
+var infect = function (grid, arr, freshnum) {
+  let hasInfect = false;
+  let m = grid.length;
+  let n = grid[0].length;
+  let arrTemp = arr.slice(0);
+  arr = [];
+  while (arrTemp.length) {
+    let [i, j] = arrTemp.pop();
+
+    if (i - 1 >= 0 && grid[i - 1][j] === 1) {
+      hasInfect = true;
+      grid[i - 1][j] = 2;
+      freshnum--;
+      arr.push([i - 1, j]);
+    }
+    if (j - 1 >= 0 && grid[i][j - 1] === 1) {
+      grid[i][j - 1] = 2;
+      hasInfect = true;
+      freshnum--;
+      arr.push([i, j - 1]);
+    }
+    if (i + 1 < m && grid[i + 1][j] === 1) {
+      grid[i + 1][j] = 2;
+      hasInfect = true;
+      freshnum--;
+      arr.push([i + 1, j]);
+    }
+    if (j + 1 < n && grid[i][j + 1] === 1) {
+      grid[i][j + 1] = 2;
+      hasInfect = true;
+      freshnum--;
+      arr.push([i, j + 1]);
+    }
+  }
+  return [hasInfect, freshnum, arr];
+};
+
+console.log(
+  orangesRotting([
+    [2, 1, 1],
+    [1, 1, 0],
+    [0, 1, 1],
+  ])
+);

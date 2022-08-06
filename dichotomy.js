@@ -72,3 +72,37 @@ function localMinima(arr) {
   }
   return null;
 }
+
+// 寻找峰值
+var findPeakElement = function (nums) {
+  debugger;
+  let length = nums.length;
+
+  let l = 0,
+    r = length - 1;
+
+  while (l <= r) {
+    let mid = Math.floor(l + (r - l) / 2);
+    if ((mid === length - 1 || nums[mid] > nums[mid + 1]) && (mid = 0 || nums[mid] > nums[mid - 1])) return mid;
+    if (nums[mid] < nums[mid - 1]) r = mid - 1;
+    else l = mid + 1;
+  }
+  return l;
+};
+
+// console.log(findPeakElement([1, 2, 3, 1]));
+
+var findMin = function (nums) {
+  debugger;
+  let l = 0,
+    r = nums.length - 1;
+  while (l <= r) {
+    let mid = Math.floor(l + (r - l) / 2);
+    if ((mid === 0 || nums[mid] < nums[mid - 1]) && (mid === nums.length - 1 || nums[mid] < nums[mid + 1])) return nums[mid];
+    if (nums[mid] > nums[mid - 1]) l = mid + 1;
+    else r = mid - 1;
+  }
+  return nums[r];
+};
+
+console.log(findMin([4, 5, 6, 7, 0, 1, 2]));

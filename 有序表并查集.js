@@ -28,7 +28,7 @@ function countIslands(arr) {
 
 function infectProcess(arr, i, j) {
   let hasNeighbor = false; // 没用
-  arr[i][j] = 2;
+  arr[i][j] = 2; // 先设2
   // 上
   if (i - 1 >= 0 && arr[i - 1][j] === 1) {
     // 边界条件，大于等于0

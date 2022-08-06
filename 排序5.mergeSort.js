@@ -133,3 +133,45 @@ function mergeCP(arr, l, m, r) {
   }
   return count;
 }
+
+// 寻找逆序对
+var reversePairs = function (nums) {
+  debugger;
+  return reversePairsProcess(nums, 0, nums.length - 1);
+};
+
+var reversePairsProcess = function (nums, l, r) {
+  if (l === r) return 0;
+  let mid = Math.floor(l + (r - l) / 2);
+  // 注意返回值是三个加起来；
+  return reversePairsProcess(nums, l, mid) + reversePairsProcess(nums, mid + 1, r) + mergexx(nums, l, r, mid);
+};
+
+var mergexx = function (nums, l, r, mid) {
+  if (l === r) return 0;
+  let result = [];
+  let sum = 0;
+  let i, j;
+
+  for (i = l, j = mid + 1; i <= mid && j <= r; ) {
+    // 注意边界条件
+    if (nums[i] <= nums[j]) {
+      result.push(nums[i++]);
+    } else {
+      sum += mid + 1 - i;
+      result.push(nums[j++]);
+    }
+  }
+  while (i <= mid) {
+    result.push(nums[i++]);
+  }
+  while (j <= r) {
+    result.push(nums[j++]);
+  }
+  for (i = l; i <= r; i++) {
+    nums[i] = result[i - l];
+  }
+  return sum;
+};
+
+console.log(reversePairs([7, 5, 6, 4]));

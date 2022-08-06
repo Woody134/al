@@ -338,15 +338,14 @@ function isFBT(head) {
 // console.log(isFBT(root2));
 
 /**
- * 判断一棵树是否是平衡二叉树
- * 平衡二叉树：每一棵子树左右子树高度差不大于1
- */
-
-/**
  * 二叉树的递归套路：
  * 树型dp（动态规划）
  * 我可以向左树要信息，可以向右数要信息
  * 确定要什么信息，确定信息结构体
+ */
+/**
+ * 判断一棵树是否是平衡二叉树
+ * 平衡二叉树：每一棵子树左右子树高度差不大于1
  */
 function isBalanceBT(head) {
   return isBalanceBTProcess(head).isBalanced;
@@ -390,4 +389,98 @@ function isFullBTProcess(head) {
     level: Math.max(leftR.level, rightR.level) + 1,
   };
 }
-console.log(isFullBT(root2));
+// console.log(isFullBT(root2));
+
+var isSymmetric = function (root) {
+  if (!root || !root.left || !root.right) return true;
+  let stack = [];
+  leftProcess(root.left, stack);
+  return rightProcess(root.right, stack);
+};
+
+var leftProcess = function (root, stack) {
+  if (!root) return;
+  root.left && leftProcess(root.left, stack);
+  !root.left && root.right && stack.push(null); // 用null补满
+  stack.push(root);
+  root.right && leftProcess(root.right, stack);
+  !root.right && root.left && stack.push(null);
+};
+
+var rightProcess = function (root, stackL) {
+  if (!root && stackL.length) return false;
+  if (!root && !stackL.length) return true;
+  root.left && rightProcess(root.left, stackL);
+  if (!root.left && root.right && stackL.pop() !== null) {
+    return false;
+  }
+  if (stackL.pop().value !== root.val) return false;
+  root.right && rightProcess(root.right, stackL);
+  if (!root.right && root.left && stackL.pop() !== null) {
+    return false;
+  }
+};
+
+// function getBTmmm() {
+//   let head = new Node(1);
+//   head.left = new Node(2);
+//   head.right = new Node(2);
+//   head.left.left = new Node(null);
+//   head.left.right = new Node(3);
+//   head.right.left = new Node(null);
+//   head.right.right = new Node(3);
+//   return head;
+// }
+
+// let bt = getBTmmm();
+// console.log(isSymmetric(bt));
+
+var isValidBST = function (root) {
+  return process(root).is;
+};
+
+var process = function process(root) {
+  if (!root) {
+    return {
+      is: true,
+      min: Number.POSITIVE_INFINITY, // 注意min max
+      max: Number.NEGATIVE_INFINITY,
+    };
+  }
+  let left = process(root.left);
+  let right = process(root.right);
+  return {
+    is: left.is && right.is && left.max < root.value && right.min > root.value,
+    min: Math.min(left.min, root.value, right.min),
+    max: Math.max(right.max, root.value, left.max),
+  };
+};
+
+function getBTmmm() {
+  let head = new Node(0);
+  return head;
+}
+
+let bt = getBTmmm();
+
+// console.log(isValidBST(bt));
+
+var buildTree = function (preorder, inorder) {
+  let indexMap = new Map();
+  inorder.forEach((item, i) => {
+    indexMap.set(item, i);
+  });
+  return process(preorder, inorder, indexMap, 0);
+};
+
+var process = function (preorder, inorder, indexMap, diff) {
+  if (!preorder.length) return null;
+  let head = new Node(preorder.shift());
+  let index = indexMap.get(head.value) - diff;
+  let index2 = inorder.indexOf(head.value);
+  head.left = process(preorder.slice(0, index), inorder.slice(0, index), indexMap, 0);
+  head.right = process(preorder.slice(index), inorder.slice(index + 1), indexMap, diff + index + 1);
+  return head;
+};
+
+console.log(buildTree([1, 2, 3, 4], [1, 2, 3, 4]));

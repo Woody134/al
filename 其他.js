@@ -153,7 +153,6 @@ var getManacherString = function (str) {
   }
   // result.concat('#');
   result = result.padEnd(result.length + 1, '#');
-
   return result;
 };
 
@@ -247,19 +246,5 @@ var maxSumMinProduct = function (nums) {
   return maxIndex;
 };
 
-/**
- * nums l+1 r-1范围上求和
- *
- * @param {*} nums
- * @param {*} l
- * @param {*} r
- */
-var getSum = function (nums, l, r) {
-  let sum = 0;
-  for (let i = l + 1; i < r; i++) {
-    sum += nums[i];
-  }
-  return sum;
-};
-
-console.log();
+// todo
+// kmp manancher等算法
