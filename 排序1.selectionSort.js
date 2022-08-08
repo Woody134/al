@@ -26,3 +26,15 @@ function selectionSort(array) {
   }
   return array;
 }
+
+function selectionSort(arr) {
+  if (arr === null) return arr;
+  for (let i = 0; i < arr.length; i++) {
+    let minIndex = i; // 注意minindex每轮初始值是i,不是0
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[j] < arr[minIndex]) minIndex = j;
+    }
+    [arr[minIndex], arr[i]] = [arr[i], arr[minIndex]];
+  }
+  return arr;
+}

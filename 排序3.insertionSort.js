@@ -12,23 +12,23 @@
 
  */
 // 基础写法
-function insertionSort(arr) {
-  if (!arr || arr.length < 2) {
-    return arr;
-  }
-  for (let i = 1; i < arr.length; i++) {
-    let n = arr[i];
-    for (let j = i - 1; j >= 0; j--) {
-      if (n < arr[j]) {
-        arr[j + 1] = arr[j];
-      } else {
-        arr[j + 1] = n;
-        break;
-      }
-    }
-  }
-  return arr;
-}
+// function insertionSort(arr) {
+//   if (!arr || arr.length < 2) {
+//     return arr;
+//   }
+//   for (let i = 1; i < arr.length; i++) {
+//     let n = arr[i];
+//     for (let j = i - 1; j >= 0; j--) {
+//       if (n < arr[j]) {
+//         arr[j + 1] = arr[j];
+//       } else {
+//         arr[j + 1] = n;
+//         break;
+//       }
+//     }
+//   }
+//   return arr;
+// }
 
 // 二分
 function binarySearchFirstEqualMore(arr, num, s, e) {
@@ -64,3 +64,19 @@ function binarySearchInsertionSort(arr) {
 }
 
 console.log(binarySearchInsertionSort([2, 6, 7, 2, 9, 1, 0, 10]));
+
+function insertionSort(arr) {
+  if (arr === null) return arr;
+  for (let i = 1; i < arr.length; i++) {
+    let n = arr[i];
+    let j = i - 1;
+    for (; j >= 0; j--) {
+      if (arr[j] > n) arr[j + 1] = arr[j];
+      else {
+        break;
+      }
+    }
+    arr[j] = n;
+  }
+  return arr;
+}
