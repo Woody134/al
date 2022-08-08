@@ -541,42 +541,6 @@ let compose = function (...fns) {
 // console.log(a(1)); // 1+4+3+2+1=11
 
 /**
- * settimeout setinterval
- */
-// 7.用setTimeout模拟setInterval
-// setInterval缺点，queue里有interval待执行时，就不往里推了；可能连续执行
-function myInterval(fn, t) {
-  let timer = null;
-  function interval() {
-    fn();
-    timer = setTimeout(interval, t);
-  }
-  interval();
-  return {
-    cancel: () => {
-      clearTimeout(timer);
-      timer = null;
-    },
-  };
-}
-// 使用
-// let a = myInterval(() => {
-//   console.log(111);
-// }, 1000);
-// 用setInterval模拟setTimeout
-function myTimeout(fn, t) {
-  let timer = setInterval(() => {
-    clearInterval(timer);
-    timer = null;
-    fn();
-  }, t);
-}
-
-/**
- * 发布订阅 todo
- */
-
-/**
  * 数组相关
  */
 // 数组扁平化，多维数组扁平化为一位数组
@@ -704,5 +668,221 @@ var SymbolPolyfill = function Symbol(description) {
  */
 
 /**
+ * settimeout setinterval
+ */
+// 7.用setTimeout模拟setInterval
+// setInterval缺点，queue里有interval待执行时，就不往里推了；可能连续执行
+function myInterval(fn, t) {
+  let timer = null;
+  function interval() {
+    fn();
+    timer = setTimeout(interval, t);
+  }
+  interval();
+  return {
+    cancel: () => {
+      clearTimeout(timer);
+      timer = null;
+    },
+  };
+}
+// 使用
+// let a = myInterval(() => {
+//   console.log(111);
+// }, 1000);
+// 用setInterval模拟setTimeout
+function myTimeout(fn, t) {
+  let timer = setInterval(() => {
+    clearInterval(timer);
+    timer = null;
+    fn();
+  }, t);
+}
+
+/**
  * 防抖，节流todo
+ */
+/**
+ * 节流
+ * 连续触发事件但是在 n 秒中只执行一次函数
+ * 例：
+ * （连续不断动都需要调用时用，设一时间间隔），
+ * 像dom的拖拽，如果用消抖的话，就会出现卡顿的感觉，
+ * 因为只在停止的时候执行了一次，这个时候就应该用节流，
+ * 在一定时间内多次执行，会流畅很多。
+ */
+function throttle(fn, delay) {
+  let timer;
+  return function () {
+    let args = arguments;
+    if (timer) {
+      return;
+    }
+    timer = setTimeout(() => {
+      // this和外面的this一致
+      fn.apply(this, args);
+      timer = null;
+    }, delay);
+  };
+}
+
+// function throttle(fn, delay) {
+//   let timer;
+//   return function () {
+//     var _this = this;
+//     var args = arguments;
+//     if (timer) {
+//       return;
+//     }
+//     timer = setTimeout(function () {
+//       fn.apply(_this, args); // 这里args接收的是外边返回的函数的参数，不能用arguments
+//       // fn.apply(_this, arguments); 需要注意：Chrome 14 以及 Internet Explorer 9 仍然不接受类数组对象。如果传入类数组对象，它们会抛出异常。
+//       timer = null; // 在delay后执行完fn之后清空timer，此时timer为假，throttle触发可以进入计时器
+//     }, delay);
+//   };
+// }
+
+// // 使用
+// window.onload = function () {
+//   document.getElementById('hh').onclick = throttle(function () {
+//     console.log(2);
+//   }, 2000);
+// };
+
+/**
+ * 防抖
+ * 指触发事件后在 n 秒内函数只能执行一次，如果在 n 秒内又触发了事件，则会重新计算函数执行时间。
+ */
+function debounce(fn, delay) {
+  let timer;
+  console.log('arguments:', arguments);
+
+  return function () {
+    let args = arguments; // 是啥
+    console.log('args:', args);
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+      timer = null;
+    }, delay);
+  };
+}
+
+// // 使用
+// window.onload = function () {
+//   document.getElementById('hh').onclick = debounce(function () {
+//     console.log(2);
+//   }, 2000);
+// };
+
+function debounceMax(fn, delay, maxTime) {
+  let timer;
+  let endTime;
+
+  return function () {
+    let args = arguments; // 是啥
+    if (!endTime) {
+      endTime = Date.now() + maxTime;
+    }
+    let remainTime = Math.min(endTime - Date.now(), delay);
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+      timer = null;
+      endTime = null;
+    }, remainTime);
+  };
+}
+
+// 使用
+window.onload = function () {
+  document.getElementById('hh').onclick = debounceMax(
+    function () {
+      console.log(2);
+    },
+    2000,
+    5000
+  );
+};
+
+/**
+ * EventBus
+ * 实现EventBus类，有 on off once trigger功能，
+ * 分别对应绑定事件监听器，解绑，执行一次后解除事件绑定，触发事件监听器。
+ *
+ * 核心，维护一个对象，key:事件名eventname ，value：绑定的fn
+ */
+class EventBus {
+  constructor() {
+    this.eventlist = {}; // 收集事件对象
+  }
+
+  $on(eventName, fn) {
+    this.eventlist[eventName] ? this.eventlist[eventName].push(fn) : (this.eventlist[eventName] = [fn]);
+  }
+
+  $emit(eventName, ...rest) {
+    if (!eventName) throw new Error('事件名不能为空');
+    if (this.eventlist[eventName]) {
+      this.eventlist[eventName].forEach((fn) => {
+        try {
+          fn(...rest);
+        } catch (e) {
+          console.error(e + 'eventname:' + eventName);
+        }
+      });
+    }
+  }
+
+  $once(eventName, fn) {
+    const _this = this;
+    function onceHandle() {
+      fn.apply(null, arguments);
+      _this.$off(eventName, onceHandle);
+    }
+    this.$on(eventName, onceHandle);
+  }
+
+  $off(eventName, fn) {
+    // 不传参数时，取消全部订阅
+    if (!arguments.length) {
+      return (this.eventlist = {});
+    }
+    // eventName是数组，逐个取消
+    if (Array.isArray(eventName)) {
+      return eventName.forEach((e) => {
+        this.$off(e, fn);
+      });
+    }
+    // !fn取消eventName下的全部
+    if (!fn) {
+      this.eventlist[eventName] = [];
+    }
+    // 取消eventName下的fn
+    this.eventlist[eventName] = this.eventlist[eventName].filter((f) => f !== fn);
+  }
+}
+
+// // 使用
+// const e = new EventBus();
+// // fn1 fn2
+// e.$on('e1', fn1);
+// e.$once('e1', fn2);
+// e.$emit('e1'); // fn1() fn2()
+// e.$emit('e1'); // fn1()
+// e.$off('e1', fn1);
+// e.$emit('e1'); // null
+
+// function fn1() {
+//   console.log('f1');
+// }
+// function fn2() {
+//   console.log('f2');
+// }
+/**
+ * 发布订阅 todo
  */
