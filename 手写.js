@@ -664,8 +664,76 @@ var SymbolPolyfill = function Symbol(description) {
 // console.log(SymbolPolyfill('hhh'));
 
 /**
- * 浅拷贝，深拷贝todo
+ * 浅拷贝
+ * 基本类型拷贝值，引用类型拷贝地址
  */
+function shallowCopy(target, origin) {
+  const basetype = ['undefined', 'boolean', 'number', 'string', 'symbol'];
+  if (origin === null || basetype.includes(typeof origin)) target = origin;
+  else if (Array.isArray(origin)) target = origin.slice(0);
+  else target = Object.assign(origin);
+  console.log(target);
+  return target;
+}
+
+// 使用
+// let a;
+// let arr = [1, 2, 3];
+// let obj = { 1: 1 };
+// let anull = null;
+// let aundefined = undefined;
+
+// shallowCopy(a, arr);
+// shallowCopy(a, obj);
+// shallowCopy(a, anull);
+// shallowCopy(a, aundefined);
+
+/**
+ * 深拷贝
+ * 对值进行拷贝，嵌套也要拷贝
+ */
+// 方法1：JSON.parse(JSON.stringify(obj))
+// 缺点，1.循环引用会报错 2.不可枚举变量，symbol会被忽略 3.function NaN Date等不能完美复制
+function deepCloneJsonParse(target, origin) {
+  return (target = JSON.parse(JSON.stringify(origin)));
+}
+// 方法2：对象的深拷贝,递归，
+// basecase 不是对象，直接赋值；是对象，遍历属性，递归深拷贝
+function isObject(val) {
+  return typeof val === 'object' && val !== null;
+}
+function deepClone(origin, hash = new WeakMap()) {
+  if (!isObject(origin)) return origin;
+  if (hash.has(origin)) return hash.get(origin);
+  let target = Array.isArray(origin) ? [] : {};
+  hash.set(origin, target);
+  Reflect.ownKeys(origin).forEach((item) => {
+    target[item] = deepClone(origin[item], hash);
+  });
+  return target;
+}
+
+// // 使用
+// var obj3 = { mm: 2 };
+// var obj1 = {
+//   a: 1,
+//   b: { a: 2 },
+//   c: [1, 2, 3],
+//   d: obj3,
+// };
+// obj3.cc = obj1;
+// var obj2 = deepClone(obj1);
+// console.log(obj1);
+// console.log(obj2);
+
+// 完美深拷贝思路（lodash）
+// 1.判断数值的数据类型
+// 2.根据特定数据类型进行具体的拷贝
+//   可遍历类型(Object/Array/Map/Set等)：遍历每个值递归处理
+//   不可遍历类型： 根据类型进行赋值
+//   根据类型，通过constructor构造初始值然后拷贝内容
+// 3.引用类型，记录拷贝情况，出现循环引用且已经拷贝过的对象，不另外拷贝
+function deeoClone(target, origin) {}
 
 /**
  * settimeout setinterval
@@ -883,6 +951,3 @@ class EventBus {
 // function fn2() {
 //   console.log('f2');
 // }
-/**
- * 发布订阅 todo
- */
